@@ -31,12 +31,15 @@ public class AppDaoImplement implements AppDao {
         return em.find(Instructor.class, theId);
     }
 
-    // @Override 
-    // @Transactional 
-    // public void deleteInstructorById(int theId) {
-    //     Instructor in = em.find(Instructor.class, theId);
-    //     em.remove(in);
-    // }
+    @Override 
+    @Transactional 
+    public void deleteInstructorId(int theId) {
+        // retrieve the instructor
+        Instructor in = em.find(Instructor.class, theId);
+
+        // delete the instructor
+        em.remove(in);
+    }
 
     public InstructorDetail findInstructorDetailById(int theId) {
         return em.find(InstructorDetail.class, theId);
@@ -182,5 +185,26 @@ public class AppDaoImplement implements AppDao {
     @Transactional
     public void update(Student student) {
         em.merge(student);
+    }
+
+    @Override
+    @Transactional
+    public void deleteStudentById(int theId) {
+        // retrieve student
+        Student student = em.find(Student.class, theId);
+
+        if (student != null) {
+            // get the courses
+            List<Course> courses = student.getCourses();
+
+            // break the associations of courses for student
+            for (Course c : courses) {
+                c.getStudents().remove(student);
+            }
+        }
+
+        // delete only the student
+        // does not include courses associated
+        em.remove(student);
     }
 }
